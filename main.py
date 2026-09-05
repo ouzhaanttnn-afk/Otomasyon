@@ -11,8 +11,10 @@ from __future__ import annotations
 
 import argparse
 import sys
+import time
 
 from beyin101.config import Config, ConfigError, redact, require_ffmpeg
+from beyin101.batch import run_batch
 from beyin101.pipeline import generate
 from beyin101.topics import BY_SLUG, TOPICS
 
@@ -181,6 +183,39 @@ def run_topic(slug: str) -> int:
     return 0
 
 
+def cmd_batch(limit: int | None) -> int:
+    """Produce every topic in one unattended run."""
+    try:
+        config = Config.load()
+    except ConfigError as exc:
+        print(f"\n❌ {exc}\n")
+        return 1
+
+    print("\n🎬 Toplu üretim başlıyor. Bilgisayarı açık bırakman yeterli.\n")
+    started = time.time()
+    report = run_batch(config, limit=limit)
+
+    print("\n" + "=" * 42)
+    print("  TOPLU ÜRETİM RAPORU")
+    print("=" * 42)
+    for outcome in report.outcomes:
+        mark = {"done": "✅", "skipped": "⏭ ", "failed": "❌", "stopped": "⏹ "}[outcome.state]
+        print(f"  {mark} {outcome.title}")
+        if outcome.state == "failed" and outcome.detail:
+            print(f"        {outcome.detail[:110]}")
+    print("-" * 42)
+    print(f"  Üretilen : {len(report.produced)} video")
+    if report.failed:
+        print(f"  Başarısız: {len(report.failed)}")
+    if report.stopped_reason:
+        print(f"  Durdu    : {report.stopped_reason}")
+    print(f"  Süre     : {(time.time() - started) / 60:.0f} dakika")
+    print(f"  Klasör   : {config.output_dir.resolve()}")
+    print(f"  Rapor    : {(config.output_dir / 'toplu_uretim_raporu.txt').resolve()}")
+    print()
+    return 0 if report.produced else 1
+
+
 def interactive() -> int:
     cmd_list()
     try:
@@ -200,12 +235,18 @@ def main() -> int:
     parser.add_argument("--list", action="store_true", help="konuları listele")
     parser.add_argument("--topic", help="üretilecek konunun slug'ı")
     parser.add_argument("--all", action="store_true", help="tüm konuları üret")
+    parser.add_argument("--batch", action="store_true",
+                        help="gözetimsiz toplu üretim: kota bitene kadar devam eder")
+    parser.add_argument("--limit", type=int, default=None,
+                        help="--batch ile: en fazla kaç video üretilsin")
     args = parser.parse_args()
 
     if args.check:
         return cmd_check()
     if args.list:
         return cmd_list()
+    if args.batch:
+        return cmd_batch(args.limit)
     if args.all:
         return max(run_topic(t.slug) for t in TOPICS)
     if args.topic:

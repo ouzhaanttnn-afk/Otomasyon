@@ -184,11 +184,33 @@ python main.py
 # doğrudan bir konu
 python main.py --topic hafiza
 
-# hepsi
-python main.py --all
-
 # konuları listele
 python main.py --list
+```
+
+### Gözetimsiz toplu üretim
+
+```bash
+python main.py --batch
+```
+
+Sırayla bütün konuları üretir. Başında beklemene gerek yok:
+
+- **Biteni tekrar üretmez.** Klasöründe uzun videosu olan konu atlanır, yani
+  yarıda kesilen bir çalışmayı tekrar başlatmak baştan başlamak anlamına gelmez.
+- **Kota bitince temiz durur.** Her konudan önce kalan karakter hakkını kontrol
+  eder; sıradaki metin sığmıyorsa başlamaz. Anahtarın kotayı okuyamıyorsa, API
+  kotanın bittiğini bildirdiği anda durur.
+- **Bir konu patlarsa diğerleri devam eder.** Hatalar rapora yazılır, üretim
+  durmaz.
+- **Rapor bırakır.** `output/toplu_uretim_raporu.txt` dosyasında hangi videonun
+  üretildiği, hangisinin neden atlandığı yazılıdır. Her videodan sonra
+  güncellenir, yani iş yarıda kalsa bile rapor elinde olur.
+
+En fazla kaç video üretileceğini sınırlamak istersen:
+
+```bash
+python main.py --batch --limit 10
 ```
 
 ### Tarayıcı arayüzü
@@ -230,8 +252,12 @@ kopyalayabilirsin.
 | Pixabay | Ücretsiz |
 | FFmpeg | Ücretsiz |
 
-Beş konunun toplamı yaklaşık **30.000 karakter** — yani aylık kotanın üçte
-biri. Kalan kotayla yeni konular ekleyebilirsin.
+Depoda **20 konu** var, toplamı yaklaşık **91.000 karakter**. Yani aylık
+kotanın neredeyse tamamı. Hepsini tek seferde üretmek istiyorsan kotanın taze
+olması gerekir; değilse toplu üretim yettiği yere kadar gider ve durur.
+
+Kaba ölçü: bir video ortalama **4.500 karakter**, yani 100.000 karakterlik
+kotayla ayda yaklaşık **20 video**.
 
 Süreç yarıda kalırsa endişelenme: üretilen ses parçaları diske yazılıyor,
 tekrar çalıştırdığında kaldığı yerden devam eder ve aynı metin için ikinci kez
@@ -258,8 +284,8 @@ Topic(
 ),
 ```
 
-Metin uzunluğu için kaba ölçü: **1 dakika ≈ 900 karakter**. Sekiz dakikalık
-bir video için yaklaşık 7.000 karakter.
+Metin uzunluğu için kaba ölçü: **1 dakika ≈ 800 karakter**. Mevcut metinler
+4.000–7.000 karakter arasında, yani 5–8 dakikalık videolar üretiyor.
 
 ---
 

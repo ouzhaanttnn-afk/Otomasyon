@@ -20,6 +20,15 @@ API = "https://api.elevenlabs.io/v1/text-to-speech"
 CHUNK_CHARS = 2400
 
 
+class QuotaExhausted(RuntimeError):
+    """The account is out of characters.
+
+    Distinct from other failures because it is not worth retrying and, in a
+    batch, it means every remaining topic will fail the same way — so the run
+    should stop rather than grind through nineteen identical errors.
+    """
+
+
 def split_sentences(text: str) -> list[str]:
     parts = re.split(r"(?<=[.!?…])\s+", text.strip())
     return [p.strip() for p in parts if p.strip()]
@@ -38,6 +47,16 @@ def chunk_text(text: str, limit: int = CHUNK_CHARS) -> list[str]:
     if current:
         chunks.append(current)
     return chunks
+
+
+def _is_quota_error(response) -> bool:
+    """Whether a refusal is about exhausted characters rather than a bad key."""
+    try:
+        detail = response.json().get("detail", {})
+    except ValueError:
+        return "quota" in response.text.lower()
+    text = str(detail).lower()
+    return "quota" in text or "exceeded" in text or "insufficient" in text
 
 
 def _render_chunk(
@@ -76,11 +95,18 @@ def _render_chunk(
             )
             if response.status_code == 429:
                 wait = 2 ** attempt * 5
-                print(f"   kota sınırı, {wait}s bekleniyor…")
+                print(f"   hız sınırı, {wait}s bekleniyor…")
                 time.sleep(wait)
                 continue
+            if response.status_code in (401, 402) and _is_quota_error(response):
+                raise QuotaExhausted(
+                    "ElevenLabs karakter kotası bitti. "
+                    "Aylık kota yenilenene kadar yeni seslendirme üretilemez."
+                )
             response.raise_for_status()
             return response.content
+        except QuotaExhausted:
+            raise
         except requests.RequestException as exc:  # network or HTTP error
             last_error = exc
             if attempt == retries - 1:

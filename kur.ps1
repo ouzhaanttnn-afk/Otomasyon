@@ -123,12 +123,27 @@ try {
     Write-Host "`n===================================" -ForegroundColor Green
     Write-Host "  KURULUM BITTI" -ForegroundColor Green
     Write-Host "===================================" -ForegroundColor Green
-    Write-Host ""
-    Write-Host "  YENI bir PowerShell ac ve:" -ForegroundColor Yellow
-    Write-Host "      cd `"$Proje`""
-    Write-Host "      python main.py"
-    Write-Host ""
-    Write-Host "  (Yeni pencere sart: PATH degisikligi eskisinde gorunmez.)" -ForegroundColor Yellow
+
+    if ($env:B_BATCH -eq "1") {
+        # Unattended production: the whole point is that nobody is here, so it
+        # runs in this same window and the report survives in output/.
+        Write-Host ""
+        Write-Host "  Toplu uretim basliyor. Bilgisayari acik birak." -ForegroundColor Yellow
+        Write-Host "  Bu saatler surebilir; pencereyi kapatma." -ForegroundColor Yellow
+        Write-Host ""
+        Push-Location $Proje
+        try {
+            if ($env:B_LIMIT) { & $py main.py --batch --limit $env:B_LIMIT }
+            else              { & $py main.py --batch }
+        } finally { Pop-Location }
+    } else {
+        Write-Host ""
+        Write-Host "  YENI bir PowerShell ac ve:" -ForegroundColor Yellow
+        Write-Host "      cd `"$Proje`""
+        Write-Host "      python main.py"
+        Write-Host ""
+        Write-Host "  (Yeni pencere sart: PATH degisikligi eskisinde gorunmez.)" -ForegroundColor Yellow
+    }
 }
 catch {
     $hataOldu = $true
