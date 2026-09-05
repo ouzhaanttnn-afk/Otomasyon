@@ -1,0 +1,21 @@
+# Secrets — never commit real keys
+.env
+*.key
+
+# Generated output
+output/
+*.mp3
+*.mp4
+*.wav
+cache/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db

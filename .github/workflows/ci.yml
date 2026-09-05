@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Bağımlılıkları kur
+        run: |
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Testler
+        run: pytest tests/ -q
+
+      - name: Sızmış anahtar var mı
+        run: |
+          # A committed .env, or an ElevenLabs/Pixabay key pasted into source,
+          # would be scraped within hours of being pushed to a public repo.
+          if git ls-files --error-unmatch .env 2>/dev/null; then
+            echo "::error::.env deponun içine girmiş — anahtarlar açıkta"
+            exit 1
+          fi
+          if git grep -nIE '[0-9]{8}-[0-9a-f]{25}' -- . ':!*.yml' ':!*.md'; then
+            echo "::error::Pixabay anahtarına benzeyen bir dize bulundu"
+            exit 1
+          fi
+          if git grep -nIE '\b[0-9a-f]{64}\b' -- . ':!*.yml' ':!*.md'; then
+            echo "::error::ElevenLabs anahtarına benzeyen bir dize bulundu"
+            exit 1
+          fi
+          echo "Temiz."
