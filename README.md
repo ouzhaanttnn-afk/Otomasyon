@@ -38,14 +38,32 @@ Yoksa: <https://www.python.org/downloads/> — Windows'ta kurulum sırasında
 
 Videoyu birleştiren program. Bu olmadan sistem çalışmaz.
 
-**Windows**
+**Windows — script ile (kolay yol)**
+
+Proje klasöründe PowerShell aç ve şunu çalıştır:
+
+```powershell
+# zip'i zaten indirdiysen yolunu ver
+powershell -ExecutionPolicy Bypass -File kurulum-ffmpeg.ps1 -Zip "$HOME\Downloads\ffmpeg-release-essentials.zip"
+
+# ya da indirmesini de ona bırak
+powershell -ExecutionPolicy Bypass -File kurulum-ffmpeg.ps1
+```
+
+Arşivi açar, `C:\ffmpeg` altına yerleştirir ve PATH'e ekler. Yönetici yetkisi
+gerekmez. Bittikten sonra **açık olan tüm terminalleri kapatıp yeniden aç.**
+
+**Windows — elle**
 1. <https://www.gyan.dev/ffmpeg/builds/> adresinden `ffmpeg-release-essentials.zip` indir
-2. ZIP'i aç, klasörü `C:\ffmpeg` olarak yeniden adlandır
-3. PowerShell'i **yönetici olarak** aç ve şunu yapıştır:
+2. ZIP'i aç. İçinde `ffmpeg-7.x-essentials_build` gibi tek bir klasör var;
+   onun içindekileri `C:\ffmpeg` klasörüne kopyala. Sonuçta
+   `C:\ffmpeg\bin\ffmpeg.exe` yolu oluşmalı.
+3. PowerShell aç ve şunu yapıştır:
    ```powershell
-   [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\ffmpeg\bin", "User")
+   [Environment]::SetEnvironmentVariable("Path",
+     [Environment]::GetEnvironmentVariable("Path","User") + ";C:\ffmpeg\bin", "User")
    ```
-4. PowerShell'i kapat, yeniden aç ve test et: `ffmpeg -version`
+4. PowerShell'i kapat, yeniden aç, test et: `ffmpeg -version`
 
 **macOS**
 ```bash
