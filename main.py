@@ -52,24 +52,70 @@ def cmd_check() -> int:
     # up halfway through a paid run.
     import requests
 
+    def api_detail(response) -> str:
+        """ElevenLabs explains the refusal in the body; surface it verbatim."""
+        try:
+            data = response.json()
+        except ValueError:
+            return response.text[:200]
+        detail = data.get("detail", data)
+        if isinstance(detail, dict):
+            return detail.get("message") or detail.get("status") or str(detail)[:200]
+        return str(detail)[:200]
+
+    headers = {"xi-api-key": config.elevenlabs_key}
+
+    # Quota lives behind a permission a narrowly scoped key may not carry, so a
+    # refusal here says nothing about whether narration will work.
     try:
         response = requests.get(
-            "https://api.elevenlabs.io/v1/user/subscription",
-            headers={"xi-api-key": config.elevenlabs_key},
-            timeout=30,
+            "https://api.elevenlabs.io/v1/user/subscription", headers=headers, timeout=30
         )
         if response.ok:
             data = response.json()
             used = data.get("character_count", 0)
             limit = data.get("character_limit", 0)
             left = limit - used
-            print(f"{OK} ElevenLabs bağlantısı: plan={data.get('tier')} "
-                  f"kalan kota={left}/{limit} karakter")
+            print(f"{OK} ElevenLabs kotasi: plan={data.get('tier')} "
+                  f"kalan={left}/{limit} karakter")
             if left < total_chars:
                 print(f"{WARN} Tüm konular {total_chars} karakter tutuyor, "
                       f"kalan kota yetmiyor. Tek tek üretmeyi dene.")
         else:
-            print(f"{BAD} ElevenLabs anahtarı reddedildi ({response.status_code})")
+            print(f"{WARN} Kota okunamadı ({response.status_code}: "
+                  f"{api_detail(response)})")
+            print("       Anahtarın 'User' okuma yetkisi yoksa bu normaldir; "
+                  "asıl test aşağıda.")
+    except Exception as exc:
+        print(f"{WARN} Kota sorgulanamadı: {redact(exc, config.elevenlabs_key)}")
+
+    # The real test: synthesise a few characters through the same endpoint the
+    # pipeline uses. Costs about seven characters and proves the whole path.
+    try:
+        response = requests.post(
+            f"https://api.elevenlabs.io/v1/text-to-speech/{config.elevenlabs_voice}",
+            headers={**headers, "Content-Type": "application/json"},
+            json={"text": "Merhaba.", "model_id": config.elevenlabs_model},
+            timeout=60,
+        )
+        if response.ok and response.content[:3] in (b"ID3", b"\xff\xfb", b"\xff\xf3"):
+            print(f"{OK} ElevenLabs seslendirme çalışıyor "
+                  f"({len(response.content)} bayt ses üretildi)")
+        elif response.ok:
+            print(f"{OK} ElevenLabs yanıt verdi ({len(response.content)} bayt)")
+        else:
+            detail = api_detail(response)
+            print(f"{BAD} ElevenLabs seslendirme reddedildi "
+                  f"({response.status_code}): {detail}")
+            if response.status_code == 401:
+                print("       Anahtar geçersiz ya da iptal edilmiş. Panelden yeni oluştur:")
+                print("       https://elevenlabs.io/app/settings/api-keys")
+            elif response.status_code == 400 and "voice" in detail.lower():
+                print(f"       ELEVENLABS_VOICE_ID geçersiz olabilir: {config.elevenlabs_voice}")
+                print("       ElevenLabs → Voices → sesin sayfası → ID kopyala, .env içine yaz.")
+            elif response.status_code in (401, 403):
+                print("       Anahtarın 'Text to Speech' yetkisi yok. "
+                      "Panelden yetkiyi ekle ya da tam yetkili yeni anahtar oluştur.")
             problems += 1
     except Exception as exc:
         print(f"{BAD} ElevenLabs'e ulaşılamadı: {redact(exc, config.elevenlabs_key)}")
