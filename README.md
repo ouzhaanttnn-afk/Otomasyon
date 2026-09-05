@@ -74,7 +74,18 @@ gömülen bir anahtar birkaç saat içinde otomatik taranıp kötüye kullanıl�
 Bunun yerine `.env` adında bir dosya kullanıyoruz ve o dosya `.gitignore`
 sayesinde GitHub'a **hiç gönderilmiyor**.
 
-### Adım adım
+### En kolay yol
+
+```bash
+python kurulum.py
+```
+
+Anahtarları tek tek sorar ve `.env` dosyasını doğru biçimde kendisi yazar.
+Elle dosya düzenlemen gerekmez — hangi dosyaya yazacağını karıştırma riski de
+ortadan kalkar. Anahtarını yenilediğinde de aynı komutu çalıştır: boş
+bıraktığın alanlar olduğu gibi kalır.
+
+### Elle yapmak istersen
 
 **1.** Proje klasöründe `.env.example` dosyasının bir kopyasını çıkar ve adını
 `.env` yap.
