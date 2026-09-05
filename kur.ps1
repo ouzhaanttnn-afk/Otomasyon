@@ -135,6 +135,9 @@ try {
         try {
             if ($env:B_LIMIT) { & $py main.py --batch --limit $env:B_LIMIT }
             else              { & $py main.py --batch }
+            if ($LASTEXITCODE -ne 0) {
+                throw "main.py --batch kod $LASTEXITCODE ile durdu (Ctrl+C ile kesilmis olabilir). Zaten uretilmis videolar ve indirilen ses parcalari diskte duruyor - ayni komutu tekrar calistirmak kaldigi yerden devam eder, bastan baslamaz."
+            }
         } finally { Pop-Location }
     } else {
         Write-Host ""
