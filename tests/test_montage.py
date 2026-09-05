@@ -15,7 +15,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from beyin101 import video  # noqa: E402
+from beyin101 import tts, video  # noqa: E402
 
 FFMPEG = shutil.which("ffmpeg")
 FFPROBE = shutil.which("ffprobe")
@@ -146,3 +146,72 @@ def test_shorts_survive_a_caption_that_cannot_be_drawn(tmp_path, monkeypatch):
     assert len(shorts) == 2, "altyazı başarısız olunca Shorts kaybolmamalı"
     for short in shorts:
         assert _dimensions(short) == (1080, 1920)
+
+
+def test_shorts_start_on_the_boundaries_they_are_given(assembled):
+    """Cuts must land on the paragraph offsets measured from the narration,
+    not on a stopwatch — that is the difference between a Short that opens on
+    a thought and one that opens mid-sentence."""
+    long_video, _ = assembled
+    total = video.probe_duration(FFPROBE, long_video)
+    boundaries = [0.0, 8.0, 16.0, 24.0, 32.0]
+
+    out = long_video.parent / "boundary_shorts"
+    shorts = video.build_shorts(
+        long_video, out, "Sinir Bilim",
+        ffmpeg=FFMPEG, ffprobe=FFPROBE, count=2, duration=6,
+        boundaries=boundaries,
+    )
+
+    assert len(shorts) == 2
+    for short in shorts:
+        assert video.probe_duration(FFPROBE, short) == pytest.approx(6, abs=0.3)
+
+    chosen = video.choose_short_starts(boundaries, total, 2, 6)
+    assert all(c in boundaries for c in chosen), "kesimler sınırlardan seçilmeli"
+
+
+def test_outro_boundary_is_never_chosen():
+    boundaries = [0.0, 60.0, 120.0, 180.0, 240.0]
+    chosen = video.choose_short_starts(boundaries, total=300.0, count=3, duration=30)
+    assert 240.0 not in chosen, "son paragraf outro, Short oradan başlamamalı"
+
+
+def test_falls_back_to_even_spacing_without_boundaries():
+    # A single boundary leaves nothing usable once the outro is dropped.
+    chosen = video.choose_short_starts([0.0], total=300.0, count=3, duration=30)
+    assert chosen == video.short_start_times(300.0, 3, 30)
+
+
+def test_narration_offsets_are_measured_not_estimated(tmp_path):
+    """narrate() reuses cached parts without touching the API, so this
+    exercises the real offset maths: each boundary must be the summed duration
+    of the parts before it, not a guess from character counts."""
+    # Each paragraph must exceed half the chunk limit or two will be merged
+    # into one chunk and there will be fewer boundaries than parts.
+    text = "\n\n".join(f"Paragraf {i} burada devam ediyor. " * 20 for i in range(3))
+    chunks = tts.chunk_by_paragraph(text)
+
+    parts_dir = tmp_path / "_tts_parts"
+    parts_dir.mkdir()
+    lengths = [4, 7, 5]
+    assert len(chunks) == len(lengths), f"beklenen parça sayısı değişti: {len(chunks)}"
+    for index, seconds in enumerate(lengths):
+        subprocess.run(
+            [FFMPEG, "-y", "-loglevel", "error", "-f", "lavfi",
+             "-i", f"sine=frequency=300:duration={seconds}",
+             "-c:a", "libmp3lame", str(parts_dir / f"part_{index:03d}.mp3")],
+            check=True,
+        )
+
+    destination, offsets = tts.narrate(
+        text, tmp_path / "narration.mp3",
+        api_key="unused-because-parts-are-cached",
+        voice_id="v", model_id="m", ffmpeg=FFMPEG, ffprobe=FFPROBE,
+    )
+
+    assert destination.exists()
+    assert offsets[0] == 0.0
+    assert offsets[1] == pytest.approx(4, abs=0.3)
+    assert offsets[2] == pytest.approx(11, abs=0.4)
+    assert video.probe_duration(FFPROBE, destination) == pytest.approx(16, abs=0.5)

@@ -14,10 +14,17 @@ from pathlib import Path
 
 import requests
 
+from .video import probe_duration
+
 API = "https://api.elevenlabs.io/v1/text-to-speech"
 # Well under every tier's per-request ceiling, and short enough that a failed
 # chunk is cheap to retry.
 CHUNK_CHARS = 2400
+# Narration is chunked smaller than the API requires so that paragraph
+# boundaries land often enough to give a Short somewhere sensible to start.
+# Small enough for cut points, large enough that intonation does not reset
+# every few sentences.
+PARAGRAPH_CHUNK_CHARS = 1100
 
 
 class QuotaExhausted(RuntimeError):
@@ -44,6 +51,35 @@ def chunk_text(text: str, limit: int = CHUNK_CHARS) -> list[str]:
             current = sentence
         else:
             current = f"{current} {sentence}".strip()
+    if current:
+        chunks.append(current)
+    return chunks
+
+
+def chunk_by_paragraph(text: str, limit: int = PARAGRAPH_CHUNK_CHARS) -> list[str]:
+    """Chunk on paragraph breaks, falling back to sentences when one is long.
+
+    Every chunk boundary becomes a known point on the audio timeline once the
+    parts are rendered, and a paragraph start is where a Short can begin
+    without opening mid-thought. Sentence-level chunking would give more cut
+    points but many of them land mid-argument.
+    """
+    chunks: list[str] = []
+    current = ""
+    for para in (p.strip() for p in text.split("\n\n")):
+        if not para:
+            continue
+        if len(para) > limit:
+            if current:
+                chunks.append(current)
+                current = ""
+            chunks.extend(chunk_text(para, limit))
+            continue
+        if current and len(current) + len(para) + 1 > limit:
+            chunks.append(current)
+            current = para
+        else:
+            current = f"{current} {para}".strip()
     if current:
         chunks.append(current)
     return chunks
@@ -123,9 +159,15 @@ def narrate(
     voice_id: str,
     model_id: str,
     ffmpeg: str,
-) -> Path:
-    """Render `text` to a single mp3 at `destination`."""
-    chunks = chunk_text(text)
+    ffprobe: str | None = None,
+) -> tuple[Path, list[float]]:
+    """Render `text` to one mp3 and report where each chunk begins.
+
+    The offsets are measured from the rendered parts rather than estimated
+    from character counts, so they are exact. They are what lets a Short start
+    on a paragraph instead of wherever a stopwatch happens to land.
+    """
+    chunks = chunk_by_paragraph(text)
     destination.parent.mkdir(parents=True, exist_ok=True)
     parts_dir = destination.parent / "_tts_parts"
     parts_dir.mkdir(exist_ok=True)
@@ -146,6 +188,13 @@ def narrate(
             part.write_bytes(audio)
         part_paths.append(part)
 
+    offsets: list[float] = []
+    if ffprobe:
+        running = 0.0
+        for part in part_paths:
+            offsets.append(running)
+            running += probe_duration(ffprobe, part)
+
     if len(part_paths) == 1:
         part_paths[0].replace(destination)
     else:
@@ -160,4 +209,4 @@ def narrate(
              "-c:a", "libmp3lame", "-b:a", "192k", str(destination)],
             check=True,
         )
-    return destination
+    return destination, offsets

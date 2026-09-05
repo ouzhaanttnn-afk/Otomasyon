@@ -5,6 +5,21 @@ videoyu kursun ve Shorts'ları kessin.
 
 **Çıktı:** 1 adet uzun video (1080p, yatay) + 5 adet Shorts (1080×1920, dikey).
 
+### Shorts nasıl kesiliyor?
+
+Kronometreyle değil. Seslendirme paragraf paragraf üretiliyor ve her parçanın
+gerçek süresi ölçülüyor, böylece metindeki paragraf başlarının seste tam nereye
+denk geldiği biliniyor. Shorts'lar bu noktalardan başlıyor.
+
+Sebebi şu: 90 saniyede bir kör kesmek, klibi cümlenin ortasında açıyor. Shorts'ta
+ilk iki saniyede tutamazsan izleyici kaydırıp geçiyor — bir düşüncenin başında
+açılmak ile bir cümlenin ortasında açılmak arasındaki fark burada.
+
+Videonun son paragrafı hiç seçilmiyor; orası kapanış konuşması ve "izlediğiniz
+için teşekkürler" ile açılan bir Short boşa gider. Klibin sonu hâlâ cümle
+ortasına gelebiliyor, o yüzden son saniyede ses kısılarak bitiş kasıtlı
+gösteriliyor.
+
 ---
 
 ## Ne yapıyor?
@@ -14,7 +29,7 @@ videoyu kursun ve Shorts'ları kessin.
 | Seslendirme | ElevenLabs, Türkçe, `eleven_multilingual_v2` |
 | Görseller | Pixabay'den telifsiz video klipleri |
 | Montaj | FFmpeg — klipler normalize edilip sese göre diziliyor |
-| Shorts | Videonun tamamına yayılmış 5 kesit, dikey formata çevrilmiş |
+| Shorts | Paragraf başlarından kesilmiş 5 dikey klip (1080×1920) |
 | Metadata | Başlık, açıklama ve etiketler `metadata.json` içinde |
 
 ---

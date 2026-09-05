@@ -40,16 +40,18 @@ def generate(topic: Topic, config: Config) -> Result:
     print(f"  metin: {len(script)} karakter")
 
     print("  seslendirme…")
-    narration = tts.narrate(
+    narration, boundaries = tts.narrate(
         script,
         work / "narration.mp3",
         api_key=config.elevenlabs_key,
         voice_id=config.elevenlabs_voice,
         model_id=config.elevenlabs_model,
         ffmpeg=ffmpeg,
+        ffprobe=ffprobe,
     )
     duration = video.probe_duration(ffprobe, narration)
-    print(f"  ses hazır: {duration / 60:.1f} dakika")
+    print(f"  ses hazır: {duration / 60:.1f} dakika, "
+          f"{len(boundaries)} paragraf sınırı işaretlendi")
 
     print("  görseller aranıyor…")
     hits = media.search_clips(topic.queries, api_key=config.pixabay_key)
@@ -78,6 +80,7 @@ def generate(topic: Topic, config: Config) -> Result:
         long_video, work, topic.title,
         ffmpeg=ffmpeg, ffprobe=ffprobe,
         count=config.shorts_count, duration=config.short_duration,
+        boundaries=boundaries,
     )
 
     metadata_path = work / "metadata.json"

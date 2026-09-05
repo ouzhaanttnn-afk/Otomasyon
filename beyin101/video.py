@@ -189,6 +189,33 @@ def short_start_times(total: float, count: int, duration: int) -> list[float]:
     return [round(i * step, 2) for i in range(count)]
 
 
+def choose_short_starts(
+    boundaries: list[float],
+    total: float,
+    count: int,
+    duration: int,
+) -> list[float]:
+    """Pick cut points on real paragraph boundaries, spread across the video.
+
+    Cutting on a stopwatch opens a Short mid-sentence with no hook, which is
+    where most of them lose the viewer. These offsets were measured from the
+    rendered narration parts, so each one is the moment a paragraph begins.
+
+    The final boundary is dropped because it is the outro — a Short that opens
+    with "thanks for watching" is wasted. Falls back to even spacing when
+    there are no usable boundaries.
+    """
+    usable = [b for b in boundaries[:-1] if b + duration <= total]
+    if not usable:
+        return short_start_times(total, count, duration)
+    if len(usable) <= count:
+        return usable
+    # Spread the picks over the available boundaries rather than taking the
+    # first `count`, which would cluster every Short in the opening minutes.
+    step = (len(usable) - 1) / (count - 1) if count > 1 else 0
+    return [usable[round(i * step)] for i in range(count)]
+
+
 def _escape_drawtext(text: str) -> str:
     return text.replace("\\", "\\\\").replace(":", "\\:").replace("'", "\u2019")
 
@@ -214,6 +241,7 @@ def build_shorts(
     ffprobe: str,
     count: int,
     duration: int,
+    boundaries: list[float] | None = None,
 ) -> list[Path]:
     """Cut vertical Shorts, spaced across the whole video rather than the front.
 
@@ -223,7 +251,10 @@ def build_shorts(
     destination_dir.mkdir(parents=True, exist_ok=True)
     total = probe_duration(ffprobe, source)
 
-    starts = short_start_times(total, count, duration)
+    if boundaries:
+        starts = choose_short_starts(boundaries, total, count, duration)
+    else:
+        starts = short_start_times(total, count, duration)
 
     font = find_font()
     caption = ""
@@ -245,6 +276,10 @@ def build_shorts(
         "[fg]scale=1080:-2[fgs];"
         "[bgb][fgs]overlay=(W-w)/2:(H-h)/2,setsar=1" + caption
     )
+
+    # A Short can still end mid-sentence; fading the last second makes that
+    # read as a deliberate stop rather than a dropped connection.
+    afade = f"afade=t=out:st={max(duration - 1, 0)}:d=1"
 
     base_vf = (
         "[0:v]split=2[bg][fg];"
@@ -269,6 +304,7 @@ def build_shorts(
                   "-ss", f"{coarse:.2f}", "-i", str(source),
                   "-ss", f"{fine:.2f}", "-t", str(duration),
                   "-filter_complex", graph,
+                  "-af", afade,
                   "-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
                   "-c:a", "aac", "-b:a", "160k",
                   "-movflags", "+faststart", str(target)])
