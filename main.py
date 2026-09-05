@@ -16,6 +16,7 @@ import time
 from beyin101.config import Config, ConfigError, redact, require_ffmpeg
 from beyin101.batch import run_batch
 from beyin101.pipeline import generate
+from beyin101.publish_info import backfill
 from beyin101.topics import BY_SLUG, TOPICS
 
 OK, BAD, WARN = "  ✅", "  ❌", "  ⚠️ "
@@ -179,7 +180,8 @@ def run_topic(slug: str) -> int:
     print(f"   uzun   : {result.long_video.name}")
     for short in result.shorts:
         print(f"   shorts : {short.name}")
-    print(f"   meta   : {result.metadata.name}\n")
+    print(f"   meta   : {result.metadata.name}")
+    print(f"   bilgi  : {result.info.name}  (başlık/açıklama/etiket)\n")
     return 0
 
 
@@ -216,6 +218,30 @@ def cmd_batch(limit: int | None) -> int:
     return 0 if report.produced else 1
 
 
+def cmd_write_info() -> int:
+    """Backfill the title/description/tags text file for every video that
+    already exists — including ones produced before this feature did, since
+    it works from the filesystem and topic data alone, no API calls."""
+    try:
+        config = Config.load()
+    except ConfigError as exc:
+        print(f"\n❌ {exc}\n")
+        return 1
+
+    print(f"\n📝 {config.output_dir.resolve()} taranıyor…\n")
+    written = backfill(TOPICS, config.output_dir)
+
+    if not written:
+        print("Henüz üretilmiş video bulunamadı — yazacak bir şey yok.\n")
+        return 0
+
+    for topic in written:
+        print(f"  ✅ {topic.title}")
+    print(f"\n{len(written)} video için bilgi dosyası yazıldı "
+          f"(her klasörde youtube_bilgileri.txt).\n")
+    return 0
+
+
 def interactive() -> int:
     cmd_list()
     try:
@@ -239,12 +265,17 @@ def main() -> int:
                         help="gözetimsiz toplu üretim: kota bitene kadar devam eder")
     parser.add_argument("--limit", type=int, default=None,
                         help="--batch ile: en fazla kaç video üretilsin")
+    parser.add_argument("--write-info", action="store_true",
+                        help="üretilmiş her video için başlık/açıklama/etiket "
+                             "dosyası yaz (geçmiş videolar dahil)")
     args = parser.parse_args()
 
     if args.check:
         return cmd_check()
     if args.list:
         return cmd_list()
+    if args.write_info:
+        return cmd_write_info()
     if args.batch:
         return cmd_batch(args.limit)
     if args.all:

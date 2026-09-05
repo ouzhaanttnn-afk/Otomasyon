@@ -251,11 +251,25 @@ output/
     ├── shorts_4.mp4
     ├── shorts_5.mp4
     ├── narration.mp3           ← ham seslendirme
-    └── metadata.json           ← başlık, açıklama, etiketler
+    ├── metadata.json           ← başlık, açıklama, etiketler (makine formatı, JSON)
+    └── youtube_bilgileri.txt   ← aynı bilgi, YouTube'a yapıştırmak için düz metin
 ```
 
-`metadata.json` içindeki başlık ve açıklamayı YouTube'a yüklerken doğrudan
-kopyalayabilirsin.
+`youtube_bilgileri.txt` üç bölüme ayrılmış: BAŞLIK, AÇIKLAMA, ETİKETLER
+(virgülle ayrılmış, YouTube'un etiket kutusuna doğrudan yapıştırılabilir).
+Video üretilirken otomatik yazılıyor.
+
+**Geçmiş videoların da bilgi dosyasına ihtiyacı varsa** — bu özellik
+eklenmeden önce ürettiklerin dahil — şunu çalıştır:
+
+```bash
+python main.py --write-info
+```
+
+Bu, `output/` klasöründeki her video için (uzun videosu diskte olan her konu
+için) `youtube_bilgileri.txt` dosyasını yazar ya da yeniler. Hiçbir API
+çağrısı yapmaz, sadece diskteki dosyalara bakar — kota harcamaz, anında biter,
+istediğin kadar tekrar çalıştırabilirsin.
 
 ---
 

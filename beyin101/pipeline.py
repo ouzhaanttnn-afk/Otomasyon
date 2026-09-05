@@ -6,7 +6,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-from . import media, music, tts, video
+from . import media, music, publish_info, tts, video
 from .config import Config, require_ffmpeg
 from .topics import Topic
 
@@ -21,6 +21,7 @@ class Result:
     long_video: Path
     shorts: list[Path]
     metadata: Path
+    info: Path
     seconds: float
 
 
@@ -111,10 +112,15 @@ def generate(topic: Topic, config: Config) -> Result:
         encoding="utf-8",
     )
 
+    info_path = publish_info.write_youtube_info(
+        topic, work / publish_info.FILENAME
+    )
+
     return Result(
         topic=topic,
         long_video=long_video,
         shorts=shorts,
         metadata=metadata_path,
+        info=info_path,
         seconds=time.time() - started,
     )
