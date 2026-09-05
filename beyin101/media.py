@@ -15,14 +15,53 @@ from .config import redact
 VIDEO_API = "https://pixabay.com/api/videos/"
 
 
+def interleave_by_query(per_query: dict[str, list[dict]]) -> list[dict]:
+    """Round-robin across queries instead of exhausting one before the next.
+
+    A plain dict keyed by clip id, filled query by query, keeps hits in
+    insertion order — so if the first query alone returns more hits than the
+    download limit, every downloaded clip comes from that one query and the
+    rest of the topic's queries are never reached. A topic like "zaman", whose
+    first term is "clock", ends up as nothing but spinning clocks for the
+    entire video. Round-robin picks one hit per query per round, so the final
+    list draws from every query roughly evenly regardless of how many results
+    any single one returned.
+    """
+    order = list(per_query.keys())
+    cursors = {q: 0 for q in order}
+    interleaved: list[dict] = []
+    seen_ids: set[int] = set()
+
+    progressed = True
+    while progressed:
+        progressed = False
+        for query in order:
+            hits = per_query[query]
+            cursor = cursors[query]
+            while cursor < len(hits) and hits[cursor]["id"] in seen_ids:
+                cursor += 1
+            if cursor < len(hits):
+                hit = hits[cursor]
+                interleaved.append(hit)
+                seen_ids.add(hit["id"])
+                cursors[query] = cursor + 1
+                progressed = True
+            else:
+                cursors[query] = cursor
+
+    return interleaved
+
+
 def search_clips(
     queries: list[str],
     *,
     api_key: str,
     per_query: int = 30,
 ) -> list[dict]:
-    """Pool video results across several search terms, de-duplicated by id."""
-    seen: dict[int, dict] = {}
+    """Pool video results across several search terms, interleaved so a
+    single popular query cannot crowd out the rest before download selects
+    from the front of the list."""
+    per_query_hits: dict[str, list[dict]] = {}
     for query in queries:
         try:
             response = requests.get(
@@ -42,10 +81,9 @@ def search_clips(
             print(f"   ! '{query}' araması başarısız: {redact(exc, api_key)}")
             continue
 
-        for hit in response.json().get("hits", []):
-            seen.setdefault(hit["id"], hit)
+        per_query_hits[query] = response.json().get("hits", [])
 
-    return list(seen.values())
+    return interleave_by_query(per_query_hits)
 
 
 def _best_stream(hit: dict) -> str | None:

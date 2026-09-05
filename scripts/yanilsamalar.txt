@@ -1,0 +1,71 @@
+Şu karede iki kare var. Biri açık gri, biri koyu gri görünüyor. Ölçtüğünde ikisi aynı ton.
+
+Gözlerin seni kandırmıyor. Beynin seni kandırıyor. Ve bunu bilerek yapıyor.
+
+Bugün görme yanılsamalarının bize beyin hakkında ne öğrettiğini konuşacağız.
+
+Önce şunu netleştirelim: gözlerin bir kamera değil.
+
+Bir kamera, ışığı olduğu gibi kaydediyor. Göz de ışığı algılıyor, ama beyin onu olduğu gibi göstermiyor. Yorumluyor.
+
+Bunun sebebi basit: ham veri yetersiz ve belirsiz. Retinaya düşen görüntü iki boyutlu, bulanık kenarlı ve sürekli titreşen bir şey. Beyin bundan üç boyutlu, kararlı ve anlamlı bir dünya inşa ediyor.
+
+İnşa etmek, tahmin etmek demek.
+
+Şimdi meşhur gölge yanılsamasına dönelim. İki kare gerçekte aynı gri tonda. Ama biri "gölgede" gibi çiziliyor.
+
+Beyin şunu biliyor: gölgedeki bir yüzey, aslında olduğundan daha koyu görünür. Bu yüzden gölgedeki kareyi otomatik olarak "aydınlatıyor". Algıladığın renk, ham veri değil, düzeltilmiş tahmin.
+
+Bu düzeltme yanlış değil. Günlük hayatta seni doğru sonuca ulaştırıyor. Sadece kontrollü bir laboratuvar görüntüsünde açığa çıkıyor.
+
+Şimdi başka bir örneğe bakalım: hareket sonrası yanılsaması.
+
+Uzun süre akan bir suya bakıp sonra sabit bir yüzeye baktığında, o yüzey ters yönde hareket ediyormuş gibi görünüyor.
+
+Beyninde hareketi algılayan hücreler var. Sürekli aynı yönde hareket sinyaline maruz kaldıklarında yoruluyorlar, yani duyarlılıkları düşüyor. Karşıt yöne duyarlı hücreler görece daha güçlü kalıyor. Sonuç, olmayan bir hareket algısı.
+
+Bu, bir hata değil. Bir sistemin fiziksel sınırlarının dışa vurumu.
+
+Şimdi bir soruya cevap verelim: neden bazı yanılsamalar herkeste aynı, bazıları kişiden kişiye değişiyor?
+
+Cevap, hangi varsayımın kullanıldığıyla ilgili.
+
+Bazı varsayımlar evrensel. Işığın yukarıdan geldiği varsayımı gibi. Bu, dünyanın fiziksel gerçeğiyle ilgili ve neredeyse herkeste aynı çalışıyor.
+
+Bazı varsayımlar ise deneyime dayalı. Belirsiz bir görüntüyü nasıl yorumladığın, daha önce neye alışkın olduğuna bağlı olabiliyor.
+
+Bir görüntünün iki farklı şekilde görülebildiği durumlar bunun kanıtı. Aynı çizim, bir bakışta bir şey, başka bir bakışta başka bir şey oluyor. Beyin ikisini de doğru buluyor, ama aynı anda ikisini birden göremiyorsun.
+
+Şimdi işitme tarafına da bakalım, çünkü yanılsama sadece görmede değil.
+
+Bir kelimeyi tekrar tekrar dinlediğinde, bir süre sonra farklı bir kelime duymaya başlıyorsun. Beyin, aynı sese sürekli maruz kalınca yeni bir yorum aramaya başlıyor.
+
+Bu, algının pasif bir alım değil, aktif bir arama süreci olduğunu gösteriyor.
+
+Peki bu tahmin sistemi neden bu kadar iyi çalışıyor, ama bazen bu kadar açık şekilde yanılıyor?
+
+Çünkü sistem hız için optimize edilmiş, mükemmellik için değil.
+
+Doğal ortamda karar vermen milisaniyeler içinde gerekiyordu. Yaklaşan bir hayvanın gerçekten tehlikeli olup olmadığını uzun uzun analiz eden bir ata, muhtemelen soyunu sürdüremezdi.
+
+Bu yüzden beyin, en olası açıklamayı hızla üretip ona göre hareket ediyor. Çoğu zaman doğru çıkıyor. Bazen, özellikle laboratuvar koşullarında tasarlanmış tuhaf görüntülerde, yanlış çıkıyor.
+
+Şimdi pratik bir sonuca gelelim: bu bilgiyle ne yapabilirsin?
+
+Birincisi, gözünle gördüğün her şeyin ham gerçek olmadığını bilmek. Özellikle belirsiz, düşük ışıklı ya da hızlı geçen durumlarda, beynin devreye soktuğu varsayımlar seni yanıltabiliyor. Görgü tanıklığının güvenilirliğinin sınırlı olmasının bir kısmı bununla ilgili.
+
+İkincisi, bu mekanizmanın istismar edilebildiğini bilmek. Reklam, tasarım ve hatta bazı dolandırıcılık teknikleri, algının bu kısayollarını hedef alıyor. Bir fiyat etiketinin yanına konan büyük bir sayı, gerçek fiyatı daha ucuz gösterebiliyor. Bu bir yanılsama değil ama aynı ilkeye dayanıyor: beyin bağlama göre yargılıyor, mutlak değere göre değil.
+
+Üçüncüsü, kendi kesinlik hissine şüpheyle bakmak. Bir şeyi net gördüğünü hissetmen, onun doğru olduğunun kanıtı değil. Beyin, hatalı bir tahmini de aynı netlikte sunuyor.
+
+Toparlayalım.
+
+Görme, pasif bir kayıt değil, aktif bir inşa süreci. Beyin eksik veriyi varsayımlarla tamamlıyor ve bunu sana hissettirmeden yapıyor.
+
+Yanılsamalar bir arıza değil. Hızlı çalışan bir tahmin motorunun, sınırlarını gösterdiği anlar.
+
+Ve büyük ihtimalle şu an baktığın her şeyde, fark etmeden birkaç tahmin daha oluyor.
+
+İzlediğin için teşekkürler. Faydalı bulduysan abone olabilirsin.
+
+Bir sonraki bölümde görüşmek üzere.

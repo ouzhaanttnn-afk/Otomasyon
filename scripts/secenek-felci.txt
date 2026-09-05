@@ -1,0 +1,71 @@
+Bir markette reçel almak için gidiyorsun. Karşında yirmi dört farklı çeşit var. Ne kadar sürede seçersin?
+
+Bir başka gün, aynı marketin aynı reyonunda sadece altı çeşit var.
+
+Bu iki durumda insanların davranışı çarpıcı biçimde farklı çıktı.
+
+Bugün seçenek fazlalığının seni nasıl felç ettiğini konuşacağız.
+
+Sezgi şunu söylüyor: seçenek ne kadar çoksa o kadar iyi. Daha fazla seçenek, ihtiyacına daha uygun bir şey bulma şansı demek.
+
+Bu doğru, ama sadece belirli bir noktaya kadar.
+
+Klasik bir deneyde, bir markette iki farklı reçel standı kuruldu. Birinde yirmi dört çeşit, diğerinde altı çeşit reçel vardı.
+
+Geniş seçenekli stand daha fazla insanı durdurdu, bu beklenen bir sonuç. Ama asıl çarpıcı fark satın almada ortaya çıktı.
+
+Standı durup inceleyenler arasında, altı çeşitlik standan alışveriş yapma oranı, yirmi dört çeşitlik standa göre kat kat yüksekti.
+
+Yani daha az seçenek, daha çok satışa dönüştü.
+
+Bu bulgu geniş yankı buldu ve sonraki yıllarda başka ürün kategorilerinde tekrarlanmaya çalışıldı. Bazı tekrar denemeleri aynı büyüklükte etki bulamadı, bazıları hiç etki bulamadı. Yani etkinin evrenselliği tartışmalı.
+
+Ama daha geniş bir literatür, bu tekil deneyden bağımsız olarak, seçenek fazlalığının belirli koşullarda karar kalitesini ve memnuniyeti düşürdüğünü gösteriyor.
+
+Peki bu neden oluyor?
+
+Birkaç mekanizma öne sürülüyor.
+
+Birincisi, bilişsel yük. Her ek seçenek, karşılaştırma yapman gereken bir değişken daha ekliyor. Yirmi dört seçenek arasında en iyisini bulmak, altı arasında bulmaktan çok daha fazla zihinsel çaba gerektiriyor.
+
+İkincisi, kaçırılan fırsat maliyeti. Bir şeyi seçtiğinde, seçmediğin her alternatifi de zihinsel olarak kaybediyorsun. Seçenek sayısı arttıkça, kaybettiğin alternatiflerin sayısı da artıyor. Bu, seçim sonrası pişmanlık ihtimalini büyütüyor.
+
+Üçüncüsü, beklenti artışı. Çok sayıda seçenek olduğunda, "mükemmel olanı bulabilirim" beklentisi oluşuyor. Sonunda seçtiğin şey iyi olsa bile, mükemmel olmayabilir ve bu beklenti farkı memnuniyetsizlik yaratıyor.
+
+Şimdi burada önemli bir ayrım yapalım: herkes aynı şekilde etkilenmiyor.
+
+Araştırmacılar insanları iki eğilime ayırıyor.
+
+Maksimize ediciler, her seçimde mümkün olan en iyi seçeneği bulmaya çalışıyor. Bütün alternatifleri karşılaştırıyor, karar sonrası da "acaba daha iyisi var mıydı" diye düşünmeye devam ediyor.
+
+Yeterlilikçiler ise belirli bir eşiği karşılayan ilk uygun seçeneği kabul ediyor. Mükemmeli değil, yeterince iyiyi arıyor.
+
+Çalışmalar, maksimize edici eğilimi yüksek olan insanların, aynı kaliteli sonuçları elde etseler bile, genel yaşam memnuniyetlerinin daha düşük olduğunu gösteriyor. Sürekli karşılaştırma, sürekli tatminsizlik üretiyor.
+
+Yani sorun bazen seçeneklerin sayısında değil, onlarla nasıl ilişki kurduğunda.
+
+Peki bu bilgiyle pratikte ne yapılır?
+
+Birincisi, önemsiz kararlarda seçenek havuzunu kendin küçült. Bir restoran menüsünde her seçeneği okumak yerine, önceden iki üç seçeneğe indirgemek, karar süresini ve sonrasındaki tereddüdü azaltıyor.
+
+İkincisi, "yeterince iyi" eşiği belirlemek. Önemli olmayan kararlarda, belirli kriterleri karşılayan ilk seçeneği kabul etmek, sürekli en iyiyi arama yorgunluğundan kurtarıyor.
+
+Üçüncüsü, kararı geri döndürülemez hale getirmek. Araştırmalar, bir kararı değiştirme imkânı olduğunda insanların o karardan daha az memnun kaldığını gösteriyor. Çünkü zihin, alternatifleri değerlendirmeye devam ediyor. Kararını netleştirip geri dönmeyi bırakmak, tuhaf biçimde memnuniyeti artırıyor.
+
+Dördüncüsü, önemli kararlar için seçenek sayısını değil, kriterlerini önceden belirlemek. Ne aradığını net tanımlamak, karşına çıkan onlarca seçeneği hızlı biçimde elemeni sağlıyor.
+
+Beşincisi, karşılaştırmayı sınırlamak. Sosyal medyada ya da alışverişte sürekli daha fazla seçenek görmek, mevcut seçimin değerini düşük gösteriyor. Bilinçli olarak karşılaştırmayı bir noktada durdurmak gerekiyor.
+
+Son olarak bir uyarı: bu, "az seçenek her zaman iyidir" anlamına gelmiyor. Çok az seçenek de tatminsizlik yaratabiliyor, özellikle hiçbiri ihtiyacını karşılamıyorsa.
+
+Asıl mesaj, seçenek sayısı ile karar kalitesi arasında doğrusal bir ilişki olmadığı. Belli bir noktadan sonra, ek seçenekler yardımcı olmaktan çok yük oluyor.
+
+Toparlayalım.
+
+Daha fazla seçenek, sezgisel olarak daha iyi görünüyor ama belirli bir noktadan sonra karar kalitesini ve memnuniyeti düşürüyor. Bilişsel yük, kaçırılan fırsat hissi ve şişen beklentiler bunun sebebi.
+
+Ve en büyük fark, maksimize etmeye çalışmak yerine, yeterince iyiyi kabul edebilmekte.
+
+İzlediğin için teşekkürler. Faydalı bulduysan abone olabilirsin.
+
+Bir sonraki bölümde görüşmek üzere.

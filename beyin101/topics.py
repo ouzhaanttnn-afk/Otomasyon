@@ -353,6 +353,116 @@ TOPICS: list[Topic] = [
         queries=["brain", "myth", "question mark", "science", "education", "books"],
         tags=["beyin", "mit", "bilim", "nörobilim", "yanlış bilgi"],
     ),
+    Topic(
+        slug="yanilsamalar",
+        title="Görme Yanılsamaları Ne Anlatıyor?",
+        description=(
+            "Gözlerin bir kamera değil. Beynin eksik veriyi nasıl tahminle "
+            "tamamladığını ve yanılsamaların bu sistemi nasıl açığa "
+            "çıkardığını anlatıyoruz."
+        ),
+        queries=["optical illusion", "checkerboard", "abstract pattern", "eye vision", "geometric shapes", "brain"],
+        tags=["yanılsama", "görme", "algı", "beyin", "nörobilim"],
+    ),
+    Topic(
+        slug="ikna",
+        title="İkna Psikolojisi",
+        description=(
+            "Bir hediye neden seni satın almaya itiyor? Karşılıklılık, sosyal "
+            "kanıt, kıtlık ve diğer etki ilkelerini ve bunlara karşı nasıl "
+            "korunacağını anlatıyoruz."
+        ),
+        queries=["persuasion", "sales", "negotiation", "marketing", "handshake business", "advertising"],
+        tags=["ikna", "psikoloji", "etki", "pazarlama", "davranış"],
+    ),
+    Topic(
+        slug="karar-yorgunlugu",
+        title="Karar Yorgunluğu",
+        description=(
+            "Gün ilerledikçe kararların neden kötüleşiyor? Hakim kararlarından "
+            "günlük seçimlere, karar yorgunluğunun ne olduğunu ve neyin işe "
+            "yaradığını anlatıyoruz."
+        ),
+        queries=["decision", "tired office", "choices", "judge courtroom", "overwhelmed work", "brain"],
+        tags=["karar verme", "yorgunluk", "verimlilik", "psikoloji", "beyin"],
+    ),
+    Topic(
+        slug="sikilma",
+        title="Sıkılmanın Faydası Var mı?",
+        description=(
+            "İnsanlar yalnız kalıp sıkılmaktansa kendine elektrik şoku vermeyi "
+            "tercih etti. Sıkılmanın neden bir alarm olduğunu ve yaratıcılıkla "
+            "bağını anlatıyoruz."
+        ),
+        queries=["boredom", "waiting room", "empty room", "staring window", "bored person", "daydreaming"],
+        tags=["sıkılma", "yaratıcılık", "dikkat", "psikoloji", "beyin"],
+    ),
+    Topic(
+        slug="nostalji",
+        title="Nostalji Neden İyi Hissettiriyor?",
+        description=(
+            "Bir zamanlar hastalık sayılan nostalji, bugün faydalı bir "
+            "duygusal araç olarak inceleniyor. Sosyal bağ, anlam ve ruh hali "
+            "üzerindeki etkisini anlatıyoruz."
+        ),
+        queries=["old photos", "vintage memory", "nostalgia", "family album", "retro", "sunset memory"],
+        tags=["nostalji", "hafıza", "duygu", "psikoloji", "beyin"],
+    ),
+    Topic(
+        slug="icedisadonuk",
+        title="İçe Dönük mü Dışa Dönük mü?",
+        description=(
+            "Aynı parti bir kişiyi bitkin, diğerini enerjik bırakıyor. "
+            "Uyarılma teorisini ve bunun kişilik tercihi değil biyoloji "
+            "olduğunu anlatıyoruz."
+        ),
+        queries=["party crowd", "quiet reading", "social gathering", "alone time", "personality", "friends group"],
+        tags=["içe dönük", "dışa dönük", "kişilik", "psikoloji", "beyin"],
+    ),
+    Topic(
+        slug="el-tercihi",
+        title="Neden Çoğu İnsan Sağlak?",
+        description=(
+            "İnsanların onda dokuzu sağ elini kullanıyor ve bu oran binlerce "
+            "yıldır değişmiyor. El tercihinin beyin lateralizasyonuyla "
+            "ilişkisini anlatıyoruz."
+        ),
+        queries=["handwriting hand", "writing pen", "tools hand", "scissors", "brain hemisphere", "hands"],
+        tags=["el tercihi", "solaklık", "beyin", "lateralizasyon", "nörobilim"],
+    ),
+    Topic(
+        slug="ikizler",
+        title="Doğa mı Terbiye mi? İkiz Çalışmaları",
+        description=(
+            "Ayrı büyütülen ikizlerin şaşırtıcı benzerlikleri bize ne "
+            "anlatıyor? Kalıtım payının yaşla nasıl değiştiğini ve genlerin "
+            "çevreyi nasıl şekillendirdiğini anlatıyoruz."
+        ),
+        queries=["twins", "identical twins", "family genetics", "children playing", "siblings", "dna"],
+        tags=["ikiz çalışması", "genetik", "kişilik", "gelişim", "nörobilim"],
+    ),
+    Topic(
+        slug="yalan",
+        title="Yalan Söylemek ve Yalanı Anlamak",
+        description=(
+            "İlk yalan aslında bir zihinsel gelişim işareti. Neden yüz "
+            "ifadesine bakarak yalan tespit edemediğimizi ve gerçekte neyin "
+            "işe yaradığını anlatıyoruz."
+        ),
+        queries=["lying face", "interrogation", "child playing", "poker face", "detective", "conversation"],
+        tags=["yalan", "aldatma", "psikoloji", "iletişim", "beyin"],
+    ),
+    Topic(
+        slug="secenek-felci",
+        title="Çok Seçenek Neden Kötü?",
+        description=(
+            "Yirmi dört çeşit reçel, altı çeşitten daha az sattı. Seçenek "
+            "fazlalığının karar kalitesini ve memnuniyeti nasıl düşürdüğünü "
+            "anlatıyoruz."
+        ),
+        queries=["supermarket shelf", "choices variety", "shopping decision", "grocery store", "options", "jam jars"],
+        tags=["seçenek felci", "karar verme", "tüketici psikolojisi", "davranış", "beyin"],
+    ),
 ]
 
 BY_SLUG = {topic.slug: topic for topic in TOPICS}
