@@ -47,7 +47,18 @@ class BatchReport:
 
 
 def already_produced(topic: Topic, config: Config) -> bool:
-    return (config.output_dir / topic.slug / "video_long_1080p.mp4").exists()
+    """Whether this topic is finished, not merely started.
+
+    Checking the long video alone would strand a topic whose Shorts all
+    failed: the file exists, so every later run skips it and the Shorts never
+    appear. Requiring at least one Short means such a topic is retried, and
+    the retry is cheap — the narration and clips are cached, so it costs
+    montage time and no API characters.
+    """
+    folder = config.output_dir / topic.slug
+    if not (folder / "video_long_1080p.mp4").exists():
+        return False
+    return any(folder.glob("shorts_*.mp4"))
 
 
 def remaining_characters(config: Config) -> int | None:

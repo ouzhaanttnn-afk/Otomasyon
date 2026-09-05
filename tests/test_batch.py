@@ -146,3 +146,37 @@ def test_failure_messages_do_not_leak_the_api_key(monkeypatch, config):
 
     joined = " ".join(o.detail for o in report.outcomes)
     assert config.elevenlabs_key not in joined
+
+
+def test_a_topic_whose_shorts_all_failed_is_retried(monkeypatch, config):
+    """A long video with no Shorts is unfinished work. Skipping on the long
+    video alone would strand it forever, which is exactly what happened when
+    a filter fault wiped out every Short in a run."""
+    stranded = batch.TOPICS[0]
+    folder = config.output_dir / stranded.slug
+    folder.mkdir(parents=True)
+    (folder / "video_long_1080p.mp4").write_bytes(b"x")   # no shorts_*.mp4
+
+    calls = []
+    monkeypatch.setattr(batch, "generate", _stub_generate(calls))
+    monkeypatch.setattr(batch, "remaining_characters", lambda c: 10_000_000)
+
+    batch.run_batch(config, limit=1)
+
+    assert calls == [stranded.slug], "Shorts'u eksik konu yeniden denenmeli"
+
+
+def test_a_fully_finished_topic_is_left_alone(monkeypatch, config):
+    done = batch.TOPICS[0]
+    folder = config.output_dir / done.slug
+    folder.mkdir(parents=True)
+    (folder / "video_long_1080p.mp4").write_bytes(b"x")
+    (folder / "shorts_1.mp4").write_bytes(b"x")
+
+    calls = []
+    monkeypatch.setattr(batch, "generate", _stub_generate(calls))
+    monkeypatch.setattr(batch, "remaining_characters", lambda c: 10_000_000)
+
+    batch.run_batch(config, limit=1)
+
+    assert done.slug not in calls
