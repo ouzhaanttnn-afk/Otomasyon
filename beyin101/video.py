@@ -193,6 +193,18 @@ def _escape_drawtext(text: str) -> str:
     return text.replace("\\", "\\\\").replace(":", "\\:").replace("'", "\u2019")
 
 
+def escape_font_path(path: str) -> str:
+    """Make a font path safe to embed in a filter description.
+
+    ffmpeg splits filter arguments on ':' and a Windows path carries one right
+    after the drive letter, which quoting does not protect in this parser:
+    fontfile='C:/Windows/...' is read as fontfile='C' and the rest is rejected
+    as a nameless option. Backslashes are normalised first so the escape is
+    not itself mistaken for one.
+    """
+    return path.replace("\\", "/").replace(":", "\\:")
+
+
 def build_shorts(
     source: Path,
     destination_dir: Path,
@@ -220,7 +232,8 @@ def build_shorts(
         font = None
     if font:
         caption = (
-            f",drawtext=fontfile='{font}':text='{_escape_drawtext(title)}'"
+            f",drawtext=fontfile='{escape_font_path(font)}'"
+            f":text='{_escape_drawtext(title)}'"
             ":fontcolor=white:fontsize=52:borderw=3:bordercolor=black@0.8"
             ":x=(w-text_w)/2:y=180"
         )
@@ -233,7 +246,16 @@ def build_shorts(
         "[bgb][fgs]overlay=(W-w)/2:(H-h)/2,setsar=1" + caption
     )
 
+    base_vf = (
+        "[0:v]split=2[bg][fg];"
+        "[bg]scale=1080:1920:force_original_aspect_ratio=increase,"
+        "crop=1080:1920,boxblur=luma_radius=40:luma_power=2[bgb];"
+        "[fg]scale=1080:-2[fgs];"
+        "[bgb][fgs]overlay=(W-w)/2:(H-h)/2,setsar=1"
+    )
+
     produced: list[Path] = []
+    caption_failed = False
     for index, start in enumerate(starts, start=1):
         target = destination_dir / f"shorts_{index}.mp4"
         # Seeking on the input alone snaps to the nearest keyframe, which
@@ -242,17 +264,30 @@ def build_shorts(
         # jump most of the way cheaply, then seek the last few seconds exactly.
         coarse = max(start - SEEK_PREROLL, 0.0)
         fine = start - coarse
-        try:
+        def render(graph: str) -> None:
             _run([ffmpeg, "-y", "-hide_banner", "-loglevel", "error",
                   "-ss", f"{coarse:.2f}", "-i", str(source),
                   "-ss", f"{fine:.2f}", "-t", str(duration),
-                  "-filter_complex", vf,
+                  "-filter_complex", graph,
                   "-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
                   "-c:a", "aac", "-b:a", "160k",
                   "-movflags", "+faststart", str(target)])
+
+        try:
+            render(base_vf if caption_failed else vf)
         except subprocess.CalledProcessError:
-            print(f"   ! Shorts #{index} oluşturulamadı, atlanıyor")
-            continue
+            # A caption that will not draw must never cost the whole clip:
+            # drop the title and keep the Short.
+            if caption_failed or vf == base_vf:
+                print(f"   ! Shorts #{index} oluşturulamadı, atlanıyor")
+                continue
+            print("   ! başlık yazısı çizilemedi, Shorts yazısız üretiliyor")
+            caption_failed = True
+            try:
+                render(base_vf)
+            except subprocess.CalledProcessError:
+                print(f"   ! Shorts #{index} oluşturulamadı, atlanıyor")
+                continue
         produced.append(target)
         print(f"   Shorts {index}/{len(starts)} hazır ({start:.0f}s)")
 

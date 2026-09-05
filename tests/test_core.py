@@ -132,3 +132,27 @@ class TestFilterDetection:
     def test_does_not_match_description_text(self):
         listing = "  ... something  V->V  wraps drawtext internally\n"
         assert not video.parse_filter_list(listing, "drawtext")
+
+
+class TestFontPathEscaping:
+    """A Windows font path carries a colon straight after the drive letter,
+    and ffmpeg splits filter arguments on colons — quoting does not protect
+    it, so an unescaped path silently costs every Short."""
+
+    def test_drive_colon_is_escaped(self):
+        out = video.escape_font_path("C:/Windows/Fonts/arialbd.ttf")
+        assert out == "C\\:/Windows/Fonts/arialbd.ttf"
+
+    def test_backslashes_become_forward_slashes(self):
+        out = video.escape_font_path("C:\\Windows\\Fonts\\arialbd.ttf")
+        assert "\\\\" not in out
+        assert out == "C\\:/Windows/Fonts/arialbd.ttf"
+
+    def test_posix_path_is_untouched(self):
+        path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+        assert video.escape_font_path(path) == path
+
+    def test_result_has_no_bare_colon(self):
+        for path in ("C:/a/b.ttf", "D:\\x\\y.ttf"):
+            out = video.escape_font_path(path)
+            assert ":" not in out.replace("\\:", "")

@@ -109,3 +109,40 @@ def test_shorts_are_exactly_the_requested_length(assembled):
     _, shorts = assembled
     for short in shorts:
         assert video.probe_duration(FFPROBE, short) == pytest.approx(10, abs=0.3)
+
+
+def test_shorts_survive_a_caption_that_cannot_be_drawn(tmp_path, monkeypatch):
+    """Claim drawtext is available when it is not, so the captioned command
+    fails. The Shorts must still be produced, untitled — losing the title is
+    acceptable, losing all five clips is not."""
+    clips_dir = tmp_path / "clips"
+    clips_dir.mkdir()
+    clips = [_make(clips_dir / "a.mp4", "1280x720", 25, 6)]
+
+    narration = tmp_path / "n.mp3"
+    subprocess.run(
+        [FFMPEG, "-y", "-loglevel", "error", "-f", "lavfi",
+         "-i", "sine=frequency=200:duration=20", "-c:a", "libmp3lame", str(narration)],
+        check=True,
+    )
+
+    work = tmp_path / "w"
+    work.mkdir()
+    normalised = video.normalise_clips(
+        clips, work / "norm", ffmpeg=FFMPEG, width=1920, height=1080
+    )
+    long_video = video.build_long_video(
+        normalised, narration, tmp_path / "long.mp4", work,
+        ffmpeg=FFMPEG, ffprobe=FFPROBE,
+    )
+
+    monkeypatch.setattr(video, "has_filter", lambda ffmpeg, name: True)
+    monkeypatch.setattr(video, "find_font", lambda: "/nonexistent/font.ttf")
+
+    shorts = video.build_shorts(
+        long_video, tmp_path / "out", "Dopamin: Motivasyonun Kimyasi",
+        ffmpeg=FFMPEG, ffprobe=FFPROBE, count=2, duration=8,
+    )
+    assert len(shorts) == 2, "altyazı başarısız olunca Shorts kaybolmamalı"
+    for short in shorts:
+        assert _dimensions(short) == (1080, 1920)
