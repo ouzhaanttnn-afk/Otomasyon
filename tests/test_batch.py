@@ -68,7 +68,9 @@ def test_already_produced_topics_are_skipped(monkeypatch, config):
     first = batch.TOPICS[0]
     done = config.output_dir / first.slug
     done.mkdir(parents=True)
+    # Finished means the long video *and* its Shorts; see the retry test below.
     (done / "video_long_1080p.mp4").write_bytes(b"x")
+    (done / "shorts_1.mp4").write_bytes(b"x")
 
     calls = []
     monkeypatch.setattr(batch, "generate", _stub_generate(calls))
