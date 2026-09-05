@@ -267,12 +267,14 @@ kopyalayabilirsin.
 | Pixabay | Ücretsiz |
 | FFmpeg | Ücretsiz |
 
-Depoda **20 konu** var, toplamı yaklaşık **91.000 karakter**. Yani aylık
-kotanın neredeyse tamamı. Hepsini tek seferde üretmek istiyorsan kotanın taze
-olması gerekir; değilse toplu üretim yettiği yere kadar gider ve durur.
+Depoda **30 konu** var, toplamı yaklaşık **134.000 karakter**. Aylık kota
+100.000 olduğu için hepsi bir ayda çıkmaz — toplu üretim yettiği yere kadar
+gider, kalanı sıradaki ay tamamlar. Yeni konular ay değişince eklenmiş olsa da
+sıra numarası değil dosya varlığı belirleyici: `--batch` hangi konunun
+üretildiğine klasöre bakarak karar veriyor, sırayı değil.
 
 Kaba ölçü: bir video ortalama **4.500 karakter**, yani 100.000 karakterlik
-kotayla ayda yaklaşık **20 video**.
+kotayla ayda yaklaşık **20-22 video**.
 
 Süreç yarıda kalırsa endişelenme: üretilen ses parçaları diske yazılıyor,
 tekrar çalıştırdığında kaldığı yerden devam eder ve aynı metin için ikinci kez

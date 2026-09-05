@@ -244,6 +244,115 @@ TOPICS: list[Topic] = [
         queries=["clock", "time lapse", "hourglass", "calendar", "sunset", "city timelapse"],
         tags=["zaman", "algı", "beyin", "hafıza", "nörobilim"],
     ),
+    Topic(
+        slug="bilinc",
+        title="Bilinç Nedir?",
+        description=(
+            "Beyindeki işlemler neden bir şey gibi hissettiriyor? Ayrılmış "
+            "beyin hastalarından tepkisiz hastalarda bilinç ölçmeye kadar, "
+            "bilimin bu soruda nereye geldiğini anlatıyoruz."
+        ),
+        queries=["consciousness", "brain scan", "mind", "abstract neurons", "thinking", "science lab"],
+        tags=["bilinç", "beyin", "felsefe", "nörobilim", "zihin"],
+    ),
+    Topic(
+        slug="sezgi",
+        title="Sezgi Ne Zaman Güvenilir?",
+        description=(
+            "İçinden gelen ses bazen çok isabetli, bazen felaket. Sezginin "
+            "hangi koşullarda çalıştığını, hangilerinde sadece özgüven "
+            "ürettiğini anlatıyoruz."
+        ),
+        queries=["intuition", "chess player", "firefighter", "decision", "expert", "thinking"],
+        tags=["sezgi", "karar verme", "uzmanlık", "psikoloji", "beyin"],
+    ),
+    Topic(
+        slug="yalnizlik",
+        title="Yalnızlık Beyinde Ne Yapar?",
+        description=(
+            "Yalnızlık kaç kişiyle çevrili olduğunla ilgili değil. Beynin bunu "
+            "neden tehdit olarak işlediğini ve döngüyü neyin kırdığını "
+            "anlatıyoruz."
+        ),
+        queries=["loneliness", "alone city", "empty room", "solitude", "window rain", "crowd"],
+        tags=["yalnızlık", "sosyal", "beyin", "psikoloji", "sağlık"],
+    ),
+    Topic(
+        slug="korku",
+        title="Korku ve Fobiler",
+        description=(
+            "Örümceğin zararsız olduğunu bilmek neden hiçbir şeyi değiştirmiyor? "
+            "Korkunun nasıl öğrenildiğini, neden silinmediğini ve maruz "
+            "bırakmanın nasıl işlediğini anlatıyoruz."
+        ),
+        queries=["fear", "spider", "heights", "dark forest", "anxiety", "brain"],
+        tags=["korku", "fobi", "amigdala", "psikoloji", "beyin"],
+    ),
+    Topic(
+        slug="mizah",
+        title="Neden Gülüyoruz?",
+        description=(
+            "Gülmelerin çoğu şakaya verilen tepki değil. Mizahın beyindeki "
+            "mekanizmasını ve gülmenin gerçekte ne işe yaradığını anlatıyoruz."
+        ),
+        queries=["laughing", "friends laughing", "comedy", "happy people", "smile", "social"],
+        tags=["mizah", "gülme", "sosyal", "beyin", "psikoloji"],
+    ),
+    Topic(
+        slug="yaslanma",
+        title="Beyin Yaşlanınca Ne Oluyor?",
+        description=(
+            "Bazı şeyler geriliyor, bazıları gelişiyor. Normal yaşlanma ile "
+            "demansı ayıran çizgiyi ve gerçekten işe yarayan korumaları "
+            "anlatıyoruz."
+        ),
+        queries=["elderly", "senior couple", "aging", "old hands", "memory", "brain"],
+        tags=["yaşlanma", "hafıza", "demans", "beyin", "sağlık"],
+    ),
+    Topic(
+        slug="ergenlik",
+        title="Ergen Beyni",
+        description=(
+            "Ergenler riski biliyor, yine de alıyor. Ödül sistemi ile kontrol "
+            "sisteminin neden farklı hızda geliştiğini ve akranların bunu nasıl "
+            "değiştirdiğini anlatıyoruz."
+        ),
+        queries=["teenager", "high school", "youth friends", "skateboard", "students", "brain"],
+        tags=["ergenlik", "gelişim", "beyin", "ebeveynlik", "psikoloji"],
+    ),
+    Topic(
+        slug="plasebo",
+        title="Plasebo Etkisi",
+        description=(
+            "Etken maddesi olmayan bir hap nasıl işe yarıyor? Beklentinin "
+            "tetiklediği gerçek biyolojiyi ve bu etkinin nerede bittiğini "
+            "anlatıyoruz."
+        ),
+        queries=["pills", "medicine", "doctor patient", "pharmacy", "laboratory", "health"],
+        tags=["plasebo", "beklenti", "tıp", "beyin", "nörobilim"],
+    ),
+    Topic(
+        slug="koku",
+        title="Koku ve Hafıza",
+        description=(
+            "Bir koku neden seni aniden yıllar öncesine götürüyor? Kokunun "
+            "diğer duyulardan farklı yolunu ve lezzetin aslında ne olduğunu "
+            "anlatıyoruz."
+        ),
+        queries=["flowers smell", "coffee aroma", "kitchen cooking", "perfume", "nature scent", "memory"],
+        tags=["koku", "hafıza", "duyu", "beyin", "nörobilim"],
+    ),
+    Topic(
+        slug="beyin-mitleri",
+        title="Beyin Hakkında 7 Yaygın Yanlış",
+        description=(
+            "Yüzde on efsanesinden öğrenme stillerine, beyin oyunlarından "
+            "klasik müzik iddiasına: en yaygın yedi yanlışı tek tek ele "
+            "alıyoruz."
+        ),
+        queries=["brain", "myth", "question mark", "science", "education", "books"],
+        tags=["beyin", "mit", "bilim", "nörobilim", "yanlış bilgi"],
+    ),
 ]
 
 BY_SLUG = {topic.slug: topic for topic in TOPICS}
