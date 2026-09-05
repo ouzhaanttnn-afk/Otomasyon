@@ -63,6 +63,13 @@ def cmd_check() -> int:
             return detail.get("message") or detail.get("status") or str(detail)[:200]
         return str(detail)[:200]
 
+    # A key from the wrong place is indistinguishable from a revoked one in
+    # the API's reply, so say so before the request rather than after.
+    if not config.elevenlabs_key.startswith("sk_"):
+        print(f"{WARN} ElevenLabs anahtarı 'sk_' ile başlamıyor. "
+              "Panelden alınan anahtarlar bu önekle gelir; "
+              "başka bir değer kopyalanmış olabilir.")
+
     headers = {"xi-api-key": config.elevenlabs_key}
 
     # Quota lives behind a permission a narrowly scoped key may not carry, so a
