@@ -51,6 +51,8 @@ class Config:
     height: int
     shorts_count: int
     short_duration: int
+    music_dir: Path
+    music_volume: float
 
     @classmethod
     def load(cls) -> "Config":
@@ -80,6 +82,8 @@ class Config:
             height=int(os.environ.get("VIDEO_HEIGHT", 1080)),
             shorts_count=int(os.environ.get("SHORTS_COUNT", 5)),
             short_duration=int(os.environ.get("SHORT_DURATION", 90)),
+            music_dir=Path(os.environ.get("MUSIC_DIR", "music")),
+            music_volume=float(os.environ.get("MUSIC_VOLUME", 0.15)),
         )
 
 

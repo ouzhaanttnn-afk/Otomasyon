@@ -6,7 +6,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-from . import media, tts, video
+from . import media, music, tts, video
 from .config import Config, require_ffmpeg
 from .topics import Topic
 
@@ -53,6 +53,15 @@ def generate(topic: Topic, config: Config) -> Result:
     print(f"  ses hazır: {duration / 60:.1f} dakika, "
           f"{len(boundaries)} paragraf sınırı işaretlendi")
 
+    narration_for_video = narration
+    track = music.pick_random_track(config.music_dir)
+    if track:
+        print(f"  arka plan müziği ekleniyor: {track.name}")
+        narration_for_video = music.mix_with_narration(
+            narration, track, work / "narration_with_music.mp3",
+            ffmpeg=ffmpeg, volume=config.music_volume,
+        )
+
     print("  görseller aranıyor…")
     hits = media.search_clips(topic.queries, api_key=config.pixabay_key)
     if not hits:
@@ -71,7 +80,7 @@ def generate(topic: Topic, config: Config) -> Result:
 
     print("  uzun video birleştiriliyor…")
     long_video = video.build_long_video(
-        normalised, narration, work / "video_long_1080p.mp4", temp,
+        normalised, narration_for_video, work / "video_long_1080p.mp4", temp,
         ffmpeg=ffmpeg, ffprobe=ffprobe,
     )
 

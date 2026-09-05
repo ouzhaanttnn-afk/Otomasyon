@@ -323,6 +323,40 @@ Daha uzunu için metinleri uzatman yeterli.
 
 ---
 
+## Arka plan müziği (isteğe bağlı)
+
+Videolara sessiz bir arka plan müziği eklemek istersen, bunu **otomatik
+indiremiyorum**: Pixabay'in API'si sadece görsel ve video için, müzik
+endpoint'i yok — kontrol ettim. Otomasyon kurmanın tek yolu ayrı bir servise
+kayıt olup ikinci bir API anahtarı almak; bunun yerine daha basit bir yol var.
+
+**1.** <https://www.youtube.com/audiolibrary> adresine git (hesap gerekmiyor).
+Sol tarafta "Attribution not required" filtresini seç, birkaç sakin/enstrümantal
+parça indir.
+
+**2.** Proje klasöründe `music` adlı bir klasör aç, indirdiğin dosyaları
+oraya koy:
+
+```
+beyin101\
+├── music\
+│   ├── sakin-1.mp3
+│   ├── sakin-2.mp3
+│   └── ...
+```
+
+**3.** Bu kadar. Bir sonraki üretimde, klasörde dosya varsa otomatik olarak
+rastgele biri seçilip anlatının altına düşük seste (`.env` içindeki
+`MUSIC_VOLUME`, varsayılan 0.15) karıştırılıyor. Klasör boşsa ya da yoksa,
+videolar öncekiyle birebir aynı şekilde, müziksiz üretiliyor — hiçbir şey
+bozulmuyor.
+
+Parça bir video için yeterince uzun değilse döngüye giriyor; anlatı bitince
+müzik de kesiliyor, fazladan sessiz kalmıyor.
+
+Müzik dosyaları `.gitignore` içindeki `*.mp3` kuralı sayesinde depoya hiç
+gitmiyor — bu tamamen yerel bir klasör.
+
 ## Sorun giderme
 
 | Belirti | Sebep / çözüm |
@@ -332,6 +366,7 @@ Daha uzunu için metinleri uzatman yeterli.
 | `ElevenLabs anahtarı reddedildi` | Anahtar yanlış kopyalanmış veya iptal edilmiş. Panelden yenisini al. |
 | `kalan kota yetmiyor` | Aylık karakter hakkın bitmiş. Tek tek üret ya da planı yükselt. |
 | Pixabay hiç sonuç döndürmedi | Anahtar geçersiz ya da internet yok. `--check` çalıştır. |
+| Müzik hiç eklenmiyor | `music` klasöründe dosya var mı kontrol et; klasör adı `.env` içindeki `MUSIC_DIR` ile eşleşmeli. |
 | Shorts'ta yazı görünmüyor | Font yok ya da FFmpeg derlemende `drawtext` filtresi yok. Video ve Shorts yine üretilir, sadece başlık yazısı olmaz. |
 
 ---
