@@ -108,3 +108,27 @@ class TestDrawtextEscaping:
         # and ffmpeg would reject the whole command.
         out = video._escape_drawtext("Dopamin: Motivasyonun Kimyası")
         assert "\\:" in out
+
+
+class TestFilterDetection:
+    """Regression cover for a build that reports libfreetype but ships no
+    drawtext: asking for the missing filter fails the entire command, so
+    every Short is lost rather than just its caption."""
+
+    LISTING = (
+        "Filters:\n"
+        "  T.. boxblur           V->V       Blur the input.\n"
+        "  ... overlay           VV->V      Overlay a video source.\n"
+        "  ..C scale             V->V       Scale the input video size.\n"
+    )
+
+    def test_finds_a_present_filter(self):
+        assert video.parse_filter_list(self.LISTING, "boxblur")
+        assert video.parse_filter_list(self.LISTING, "overlay")
+
+    def test_reports_a_missing_filter(self):
+        assert not video.parse_filter_list(self.LISTING, "drawtext")
+
+    def test_does_not_match_description_text(self):
+        listing = "  ... something  V->V  wraps drawtext internally\n"
+        assert not video.parse_filter_list(listing, "drawtext")

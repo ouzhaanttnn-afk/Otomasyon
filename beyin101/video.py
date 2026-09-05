@@ -11,6 +11,11 @@ import json
 import subprocess
 from pathlib import Path
 
+# Seconds decoded before the cut point so the exact seek has material to
+# work with. Large enough to clear a keyframe interval, small enough to stay
+# cheap.
+SEEK_PREROLL = 8.0
+
 FONT_CANDIDATES = [
     "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
     "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
@@ -25,6 +30,44 @@ def find_font() -> str | None:
         if Path(candidate).exists():
             return candidate
     return None
+
+
+_FILTER_CACHE: dict[tuple[str, str], bool] = {}
+
+
+def has_filter(ffmpeg: str, name: str) -> bool:
+    """Whether this ffmpeg build actually carries a filter.
+
+    Some widely used static builds ship without drawtext even though they
+    report libfreetype. Asking for a missing filter fails the whole command,
+    so a caption we cannot draw must be dropped from the graph rather than
+    attempted — otherwise every Short fails and the user silently gets none.
+    """
+    key = (ffmpeg, name)
+    if key not in _FILTER_CACHE:
+        try:
+            listing = subprocess.run(
+                [ffmpeg, "-hide_banner", "-filters"],
+                capture_output=True, text=True, check=True,
+            ).stdout
+        except (subprocess.CalledProcessError, OSError):
+            return False
+        _FILTER_CACHE[key] = parse_filter_list(listing, name)
+    return _FILTER_CACHE[key]
+
+
+def parse_filter_list(listing: str, name: str) -> bool:
+    """Whether `name` appears as a filter in `ffmpeg -filters` output.
+
+    Lines look like "  TS. boxblur  V->V  Blur the input." — the name is the
+    second field. Matching the raw text instead would match a filter whose
+    description merely mentions another one.
+    """
+    for line in listing.splitlines():
+        parts = line.split()
+        if len(parts) >= 2 and parts[1] == name:
+            return True
+    return False
 
 
 def probe_duration(ffprobe: str, path: Path) -> float:
@@ -172,6 +215,9 @@ def build_shorts(
 
     font = find_font()
     caption = ""
+    if font and not has_filter(ffmpeg, "drawtext"):
+        print("   ! bu ffmpeg derlemesinde drawtext yok, başlık yazısı atlanıyor")
+        font = None
     if font:
         caption = (
             f",drawtext=fontfile='{font}':text='{_escape_drawtext(title)}'"
@@ -190,9 +236,16 @@ def build_shorts(
     produced: list[Path] = []
     for index, start in enumerate(starts, start=1):
         target = destination_dir / f"shorts_{index}.mp4"
+        # Seeking on the input alone snaps to the nearest keyframe, which
+        # overshoots the requested length by seconds on a concatenated file.
+        # Seeking on the output is exact but decodes from the start. Do both:
+        # jump most of the way cheaply, then seek the last few seconds exactly.
+        coarse = max(start - SEEK_PREROLL, 0.0)
+        fine = start - coarse
         try:
             _run([ffmpeg, "-y", "-hide_banner", "-loglevel", "error",
-                  "-ss", f"{start:.2f}", "-t", str(duration), "-i", str(source),
+                  "-ss", f"{coarse:.2f}", "-i", str(source),
+                  "-ss", f"{fine:.2f}", "-t", str(duration),
                   "-filter_complex", vf,
                   "-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
                   "-c:a", "aac", "-b:a", "160k",

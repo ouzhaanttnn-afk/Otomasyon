@@ -260,7 +260,7 @@ Daha uzunu için metinleri uzatman yeterli.
 | `ElevenLabs anahtarı reddedildi` | Anahtar yanlış kopyalanmış veya iptal edilmiş. Panelden yenisini al. |
 | `kalan kota yetmiyor` | Aylık karakter hakkın bitmiş. Tek tek üret ya da planı yükselt. |
 | Pixabay hiç sonuç döndürmedi | Anahtar geçersiz ya da internet yok. `--check` çalıştır. |
-| Shorts'ta yazı görünmüyor | Sistemde uygun font bulunamamış; video yine de üretilir, sadece başlık yazısı olmaz. |
+| Shorts'ta yazı görünmüyor | Font yok ya da FFmpeg derlemende `drawtext` filtresi yok. Video ve Shorts yine üretilir, sadece başlık yazısı olmaz. |
 
 ---
 
@@ -271,8 +271,17 @@ pip install pytest
 pytest tests/ -q
 ```
 
-Testler ağ bağlantısı ve FFmpeg gerektirmez; metin bölme, Shorts zamanlaması,
-anahtar maskeleme ve konu tanımlarını doğrular.
+İki grup test var:
+
+- **`tests/test_core.py`** — ağ ve FFmpeg gerektirmez. Metin bölme, Shorts
+  zamanlaması, anahtar maskeleme, filtre yoklaması ve konu tanımları.
+- **`tests/test_montage.py`** — FFmpeg kuruluysa çalışır, değilse otomatik
+  atlanır. Sentetik kliplerle gerçek montajı yapar ve çıktının 1920×1080,
+  Shorts'ların 1080×1920 ve tam istenen sürede olduğunu doğrular.
+
+İkincisi FFmpeg kurulumunu doğrulamanın en sağlam yolu: hiç API kotası
+harcamadan, montaj zincirinin baştan sona çalıştığını gösterir. İlk videonu
+üretmeden önce bir kez çalıştırman iyi olur.
 
 ---
 
