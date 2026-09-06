@@ -17,6 +17,7 @@ from beyin101.config import Config, ConfigError, redact, require_ffmpeg
 from beyin101.batch import run_batch
 from beyin101.pipeline import generate
 from beyin101.publish_info import backfill
+from beyin101 import youtube_upload as yu
 from beyin101.topics import BY_SLUG, TOPICS
 
 OK, BAD, WARN = "  ✅", "  ❌", "  ⚠️ "
@@ -146,6 +147,19 @@ def cmd_check() -> int:
         print(f"{BAD} Pixabay'e ulaşılamadı: {redact(exc, config.pixabay_key)}")
         problems += 1
 
+    # Informational only — upload is optional, so this never counts as a
+    # problem the way a missing FFmpeg or a bad API key does.
+    if config.youtube_client_secret.exists():
+        if config.youtube_token.exists():
+            print(f"{OK} YouTube yükleme: yetkilendirilmiş "
+                  f"(gizlilik={config.youtube_privacy})")
+        else:
+            print(f"{WARN} YouTube yükleme: istemci dosyası var ama henüz "
+                  "izin verilmemiş. İlk `--upload` çalıştırmasında tarayıcı açılacak.")
+    else:
+        print(f"{WARN} YouTube otomatik yükleme kurulu değil (isteğe bağlı). "
+              "README → 'YouTube otomatik yükleme' bölümüne bak.")
+
     print()
     if problems:
         print(f"❌ {problems} sorun var. Yukarıdakileri düzeltip tekrar çalıştır.\n")
@@ -242,6 +256,93 @@ def cmd_write_info() -> int:
     return 0
 
 
+def _upload_topic(topic, config, youtube) -> bool:
+    """Upload whatever this topic still needs uploaded. Returns False on a
+    quota stop so the caller knows to end the batch, not just this topic."""
+    folder = config.output_dir / topic.slug
+    long_video = folder / "video_long_1080p.mp4"
+    if not long_video.exists():
+        print(f"  ⏭  {topic.title}: henüz üretilmemiş, atlanıyor")
+        return True
+
+    state = yu.load_upload_state(folder)
+    import time as _time
+
+    if "video_long_1080p.mp4" not in state:
+        print(f"  ⬆  {topic.title} yükleniyor…")
+        try:
+            video_id = yu.upload_video(
+                youtube, long_video,
+                title=topic.title, description=topic.description, tags=topic.tags,
+                privacy_status=config.youtube_privacy,
+            )
+        except yu.UploadQuotaExceeded as exc:
+            print(f"  ⏹  {exc}")
+            return False
+        url = f"https://youtu.be/{video_id}"
+        yu.save_upload_record(
+            folder, "video_long_1080p.mp4",
+            yu.UploadRecord(video_id, url, _time.strftime("%Y-%m-%d %H:%M:%S")),
+        )
+        print(f"     ✅ {url}  ({config.youtube_privacy})")
+    else:
+        print(f"  ⏭  {topic.title}: uzun video zaten yüklü")
+
+    if config.youtube_upload_shorts:
+        for short in sorted(folder.glob("shorts_*.mp4")):
+            if short.name in state:
+                continue
+            print(f"     ⬆  {short.name} yükleniyor…")
+            try:
+                video_id = yu.upload_video(
+                    youtube, short,
+                    title=f"{topic.title} #Shorts",
+                    description=f"{topic.description}\n\n#Shorts",
+                    tags=topic.tags,
+                    privacy_status=config.youtube_privacy,
+                )
+            except yu.UploadQuotaExceeded as exc:
+                print(f"     ⏹  {exc}")
+                return False
+            url = f"https://youtu.be/{video_id}"
+            yu.save_upload_record(
+                folder, short.name,
+                yu.UploadRecord(video_id, url, _time.strftime("%Y-%m-%d %H:%M:%S")),
+            )
+            print(f"        ✅ {url}")
+
+    return True
+
+
+def cmd_upload(slug: str | None) -> int:
+    try:
+        config = Config.load()
+    except ConfigError as exc:
+        print(f"\n❌ {exc}\n")
+        return 1
+
+    try:
+        youtube = yu.build_client(config.youtube_client_secret, config.youtube_token)
+    except yu.AuthenticationRequired as exc:
+        print(f"\n❌ {exc}\n")
+        return 1
+
+    print()
+    if slug:
+        topic = BY_SLUG.get(slug)
+        if not topic:
+            print(f"Bilinmeyen konu: {slug}")
+            return 1
+        _upload_topic(topic, config, youtube)
+    else:
+        for topic in TOPICS:
+            if not _upload_topic(topic, config, youtube):
+                print("\nGünlük kota nedeniyle duruldu. Yarın aynı komutla devam et.\n")
+                return 0
+    print()
+    return 0
+
+
 def interactive() -> int:
     cmd_list()
     try:
@@ -268,6 +369,10 @@ def main() -> int:
     parser.add_argument("--write-info", action="store_true",
                         help="üretilmiş her video için başlık/açıklama/etiket "
                              "dosyası yaz (geçmiş videolar dahil)")
+    parser.add_argument("--upload", nargs="?", const="__all__", default=None,
+                        metavar="SLUG",
+                        help="YouTube'a yükle: --upload tek konu, "
+                             "--upload (parametresiz) üretilmiş her şeyi yükler")
     args = parser.parse_args()
 
     if args.check:
@@ -276,6 +381,8 @@ def main() -> int:
         return cmd_list()
     if args.write_info:
         return cmd_write_info()
+    if args.upload:
+        return cmd_upload(None if args.upload == "__all__" else args.upload)
     if args.batch:
         return cmd_batch(args.limit)
     if args.all:

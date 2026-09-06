@@ -1,6 +1,8 @@
 # Secrets — never commit real keys
 .env
 *.key
+client_secret.json
+youtube_token.json
 
 # Generated output
 output/

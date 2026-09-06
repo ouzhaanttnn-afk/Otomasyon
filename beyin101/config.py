@@ -53,6 +53,10 @@ class Config:
     short_duration: int
     music_dir: Path
     music_volume: float
+    youtube_client_secret: Path
+    youtube_token: Path
+    youtube_privacy: str
+    youtube_upload_shorts: bool
 
     @classmethod
     def load(cls) -> "Config":
@@ -84,6 +88,12 @@ class Config:
             short_duration=int(os.environ.get("SHORT_DURATION", 90)),
             music_dir=Path(os.environ.get("MUSIC_DIR", "music")),
             music_volume=float(os.environ.get("MUSIC_VOLUME", 0.15)),
+            youtube_client_secret=Path(os.environ.get(
+                "YOUTUBE_CLIENT_SECRET", "client_secret.json")),
+            youtube_token=Path(os.environ.get("YOUTUBE_TOKEN", "youtube_token.json")),
+            youtube_privacy=os.environ.get("YOUTUBE_PRIVACY", "private"),
+            youtube_upload_shorts=os.environ.get(
+                "YOUTUBE_UPLOAD_SHORTS", "true").lower() not in ("false", "0", ""),
         )
 
 

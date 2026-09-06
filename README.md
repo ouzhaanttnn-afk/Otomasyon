@@ -228,6 +228,15 @@ En fazla kaç video üretileceğini sınırlamak istersen:
 python main.py --batch --limit 10
 ```
 
+### YouTube'a yükle
+
+```bash
+python main.py --upload
+```
+
+Üretilmiş videoları kanalına yükler. Kurulumu bir kereye mahsus — bkz.
+"YouTube otomatik yükleme" bölümü.
+
 ### Tarayıcı arayüzü
 
 ```bash
@@ -252,7 +261,8 @@ output/
     ├── shorts_5.mp4
     ├── narration.mp3           ← ham seslendirme
     ├── metadata.json           ← başlık, açıklama, etiketler (makine formatı, JSON)
-    └── youtube_bilgileri.txt   ← aynı bilgi, YouTube'a yapıştırmak için düz metin
+    ├── youtube_bilgileri.txt   ← aynı bilgi, YouTube'a yapıştırmak için düz metin
+    └── yuklendi.json           ← --upload ile yüklenenlerin kaydı (video ID, link, tarih)
 ```
 
 `youtube_bilgileri.txt` üç bölüme ayrılmış: BAŞLIK, AÇIKLAMA, ETİKETLER
@@ -328,9 +338,10 @@ salt okunur ve istek süresi saniyelerle sınırlı. Video üretimi ise dakikala
 sürüyor ve diske yazması gerekiyor. Bu iş kendi bilgisayarında ya da normal bir
 sunucuda çalışır.
 
-**YouTube'a yükleme otomatik değil.** Videolar klasöre düşüyor, yüklemeyi sen
-yapıyorsun. Otomatik yükleme için YouTube Data API ve OAuth kurulumu gerekiyor;
-henüz eklenmedi.
+**YouTube'a yükleme otomatik, ama ilk izin senden.** `--upload` komutu videoyu
+kanalına kendisi yüklüyor (bkz. "YouTube otomatik yükleme" bölümü) — tek
+seferlik olan şey, Google'ın seni tarayıcıda kanalın hangisi olduğunu
+onaylatması. Ondan sonrası tamamen otomatik.
 
 **Video süresi metne bağlı.** Mevcut metinler 7–8 dakikalık videolar üretiyor.
 Daha uzunu için metinleri uzatman yeterli.
@@ -370,6 +381,66 @@ müzik de kesiliyor, fazladan sessiz kalmıyor.
 
 Müzik dosyaları `.gitignore` içindeki `*.mp3` kuralı sayesinde depoya hiç
 gitmiyor — bu tamamen yerel bir klasör.
+
+---
+
+## YouTube otomatik yükleme (isteğe bağlı)
+
+`--upload` komutu, üretilmiş videoları (uzun video + Shorts) doğrudan YouTube
+kanalına yüklüyor. Tarayıcı eklentisi ya da bilgisayarındaki bir uygulama
+üzerinden değil — YouTube'un resmi Data API'si üzerinden, google'ın kendi
+kütüphanesiyle. Buradaki tek şey şu: **ilk izni bir kere sen vermelisin**,
+çünkü hangi Google hesabının / kanalın kullanılacağına ancak sen karar
+verebilirsin, bunu senin adına yapamam.
+
+### Kurulum (bir kereye mahsus, ~5 dakika)
+
+**1.** <https://console.cloud.google.com/> adresine git, yeni bir proje oluştur
+(isim önemli değil, örn. "beyin101").
+
+**2.** Sol menüden **APIs & Services → Library**'ye gir, "YouTube Data API v3"
+ara ve **Enable** et.
+
+**3.** **APIs & Services → Credentials → Create Credentials → OAuth client ID**
+seç. İlk seferinde "OAuth consent screen" kurmanı isteyebilir — "External" seç,
+uygulama adı olarak ne yazarsan yaz, kendi e-postanı "test user" olarak ekle.
+
+**4.** Client ID türü olarak **Desktop app** seç, oluştur, sonra **Download
+JSON** butonuna bas.
+
+**5.** İndirilen dosyayı proje klasörüne `client_secret.json` adıyla koy
+(dosya adı `.env`'deki `YOUTUBE_CLIENT_SECRET` ile eşleşmeli, varsayılan zaten
+bu isim).
+
+**6.** İlk `--upload` çalıştırmanda tarayıcı otomatik açılacak, Google hesabınla
+giriş yapıp "bu uygulamaya izin ver" diyeceksin (test modundaki uygulamalar
+için "Google doğrulamadı" uyarısı çıkar — "Advanced → Git (güvenli değil)"
+diyerek devam et, bu senin kendi projen olduğu için güvenli). Bundan sonra izin
+`youtube_token.json` içine kaydediliyor, bir daha tarayıcı açılmıyor.
+
+```bash
+python main.py --upload            # üretilmiş her şeyi yükle
+python main.py --upload hafiza     # tek bir konuyu yükle
+```
+
+`client_secret.json` ve `youtube_token.json` ikisi de `.gitignore`'da —
+depoya asla gitmiyor, tıpkı `.env` gibi kendi bilgisayarında kalıyor.
+
+### Bilmen gerekenler
+
+- **Günlük kota:** YouTube'un günlük yükleme kotası 10.000 birim, bir video
+  yüklemek ~1.600 birim tutuyor — yani günde yaklaşık **6 video**. Kota
+  dolunca `--upload` temiz bir şekilde durur, ertesi gün kaldığı yerden devam
+  eder (hangi videonun yüklendiği her konunun klasöründeki `yuklendi.json`
+  içinde tutuluyor, ikinci kez yüklenmez).
+- **Gizlilik varsayılan olarak "private".** Gözetimsiz üretilen 20-30 videoyu
+  kimse gözden geçirmeden herkese açık yapmak riskli olduğu için bilinçli
+  bir seçim. Herkese açık ya da liste dışı yapmak istersen `.env` içindeki
+  `YOUTUBE_PRIVACY` değerini `public` ya da `unlisted` yap.
+- **Shorts da yükleniyor**, `YOUTUBE_UPLOAD_SHORTS=false` yaparsan sadece uzun
+  video yüklenir.
+- Bu özellik tamamen isteğe bağlı: `client_secret.json` yoksa `--upload`
+  hariç her şey öncekiyle birebir aynı çalışmaya devam eder.
 
 ## Sorun giderme
 
